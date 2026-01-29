@@ -1,0 +1,165 @@
+{% extends "app.html" %}
+
+{% block title %}Coșul Meu - Veloce{% endblock %}
+
+{% block content %}
+<div class="container cart-page">
+    <h2><i class="fas fa-shopping-cart"></i> Coșul <span class="accent-color">Meu</span></h2>
+    <p class="page-subtitle">Mașinile salvate pentru care ești interesat.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% if masini_cos %}
+
+    <div class="cart-summary">
+        <div class="summary-item">
+            <i class="fas fa-car" ></i>
+            <span><strong>{{ masini_cos|length }}</strong> vehicul(e) în coș</span>
+        </div>
+        <div class="summary-item">
+            <i class="fas fa-euro-sign"></i>
+            <span>Valoare totală: <strong>{{ "{:,.0f}".format(masini_cos|sum(attribute=8)) }} €</strong></span>
+        </div>
+        <form method="POST" action="{{ url_for('goleste_cos') }}" class="inline-form" onsubmit="return confirm('Sigur doriți să goliți coșul?');">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-trash"></i> Golește Coșul
+            </button>
+        </form>
+    </div>
+
+    <div class="cart-items">
+        {% for masina in masini_cos %}
+        <div class="cart-item-card {{ 'item-unavailable' if masina[9] == 'Vandut' else '' }}">
+            <div class="cart-item-image">
+                <i class="fas fa-car-side"></i>
+            </div>
+            
+            <div class="cart-item-details">
+                <div class="cart-item-header">
+                    <span class="item-brand">{{ masina[2] }}</span>
+                    <h3 class="item-model">{{ masina[3] }}</h3>
+                </div>
+                
+                <div class="cart-item-specs">
+                    <span class="spec"><i class="fas fa-car "></i> {{ masina[4] }}</span>
+                    <span class="spec"><i class="fas fa-gas-pump"></i> {{ masina[5] }}</span>
+                    <span class="spec"><i class="fas fa-tachometer-alt"></i> {{ masina[6] }} CP</span>
+                    <span class="spec"><i class="fas fa-palette"></i> {{ masina[7] }}</span>
+                </div>
+                
+                <div class="cart-item-meta">
+                    <span class="vin">VIN: {{ masina[1][:12] }}...</span>
+                    <span class="date-added">Adăugat: {{ masina[10].strftime('%d.%m.%Y') if masina[10] else '-' }}</span>
+                </div>
+            </div>
+            
+            <div class="cart-item-price-action">
+                <div class="item-price">{{ "{:,.0f}".format(masina[8]) }} €</div>
+                
+                <div class="item-status">
+                    {% if masina[9] == 'Disponibil' %}
+                        <span class="badge badge-success">Disponibil</span>
+                    {% elif masina[9] == 'Rezervat' %}
+                        <span class="badge badge-warning">Rezervat</span>
+                    {% else %}
+                        <span class="badge badge-secondary">Vândut</span>
+                    {% endif %}
+                </div>
+                
+                <div class="item-actions">
+                    {% if masina[9] == 'Disponibil' %}
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openRequestModal('{{ masina[1] }}', '{{ masina[2] }} {{ masina[3] }}', '{{ masina[8] }}')">
+                        <i class="fas fa-paper-plane"></i> Solicită Achiziție
+                    </button>
+                    {% endif %}
+                    
+                    <form method="POST" action="{{ url_for('sterge_din_cos', id_cos=masina[0]) }}" class="inline-form">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-times"></i> Elimină
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    
+    <div class="empty-cart">
+        <i class="fas fa-shopping-cart fa-4x"></i>
+        <h3>Coșul tău este gol</h3>
+        <p>Nu ai salvat încă nicio mașină. Explorează oferta noastră și adaugă vehiculele care te interesează!</p>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary" >
+            <i class="fas fa-car" style="margin-top: 20px;"></i> Vezi Mașini Disponibile
+        </a>
+    </div>
+    
+    {% endif %}
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_cereri_client') }}" class="btn btn-primary">
+            <i class="fas fa-file-alt"></i> Vezi Cererile Mele
+        </a>
+        <a href="{{ url_for('route_istoric_tranzactii') }}" class="btn btn-secondary">
+            <i class="fas fa-history"></i> Tranzacțiile Mele
+        </a>
+        <a href="{{ url_for('route_interes_modele') }}" class="btn btn-secondary">
+            <i class="fas fa-heart"></i> Modele Favorite
+        </a>
+    </div>
+</div>
+
+<div id="requestModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-paper-plane"></i> Solicită Achiziție</h3>
+            <button type="button" class="modal-close" onclick="closeRequestModal()">&times;</button>
+        </div>
+        <form id="requestForm" method="POST" action="">
+            <div class="modal-body">
+                <p class="modal-car-info">
+                    <strong id="modal-car-name"></strong><br>
+                    <span id="modal-car-price"></span>
+                </p>
+                
+                <div class="form-group">
+                    <label for="mesaj">Mesaj pentru vânzător (opțional):</label>
+                    <textarea id="mesaj" name="mesaj" rows="3" placeholder="Ex: Doresc să fiu contactat după ora 18:00..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeRequestModal()">Anulează</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check"></i> Trimite Cererea
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openRequestModal(vin, carName, price) {
+    document.getElementById('modal-car-name').textContent = carName;
+    document.getElementById('modal-car-price').textContent = price + ' €';
+    document.getElementById('requestForm').action = '/cos/solicita/' + vin;
+    document.getElementById('requestModal').style.display = 'flex';
+}
+
+function closeRequestModal() {
+    document.getElementById('requestModal').style.display = 'none';
+}
+
+document.getElementById('requestModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRequestModal();
+    }
+});
+</script>
+{% endblock %}

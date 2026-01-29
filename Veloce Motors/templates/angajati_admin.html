@@ -1,0 +1,122 @@
+{% extends "app.html" %}
+
+{% block title %}Gestiune Angajați - Veloce{% endblock %}
+
+{% block content %}
+<div class="container crud-page">
+    <h2>Gestiune <span class="accent-color">Angajați</span></h2>
+    <p class="page-subtitle">Administrare completă a angajaților din sistem.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+<div class="crud-section">
+    <h3>Adaugă Angajat Nou</h3>
+    <form method="POST" action="{{ url_for('adauga_angajat') }}" class="crud-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nume">Nume</label>
+                <input type="text" id="nume" name="nume" placeholder="Ex: Popescu" required>
+            </div>
+            <div class="form-group">
+                <label for="prenume">Prenume</label>
+                <input type="text" id="prenume" name="prenume" placeholder="Ex: Ion" required>
+            </div>
+            <div class="form-group">
+                <label for="data_angajare">Data Angajării</label>
+                <input type="date" id="data_angajare" name="data_angajare" required>
+            </div>
+        </div>
+        <div class="form-row" style="margin-top: 1rem;">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Ex: ion.popescu" required>
+            </div>
+            <div class="form-group">
+                <label for="parola">Parolă</label>
+                <input type="password" id="parola" name="parola" placeholder="Parola contului" required>
+            </div>
+            <input type="hidden" name="rol" value="Vanzator">
+            <div class="form-group-btn" style="margin-left: 30px;">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Adaugă
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+    
+    <div class="crud-section">
+        <h3>Lista Angajaților </h3>
+        
+        {% if angajati %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nume</th>
+                        <th>Prenume</th>
+                        <th>Data Angajării</th>
+                        <th>Cont Utilizator</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for angajat in angajati %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('modifica_angajat', id_angajat=angajat[0]) }}" class="inline-form" id="form-{{ angajat[0] }}">
+                                <input type="text" name="nume" value="{{ angajat[1] }}" class="input-inline">
+                        </td>
+                        <td>
+                                <input type="text" name="prenume" value="{{ angajat[2] }}" class="input-inline">
+                        </td>
+                        <td>
+                                <input type="date" name="data_angajare" value="{{ angajat[3].strftime('%Y-%m-%d') if angajat[3] else '' }}" class="input-inline">
+                            </form>
+                        </td>
+                        <td>
+                            <span class="badge {{ 'badge-success' if angajat[4] != 'Fără cont' else 'badge-secondary' }}">
+                                {{ angajat[4] }}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <button type="submit" form="form-{{ angajat[0] }}" class="btn btn-sm btn-primary" title="Salvează modificările">
+                                <i class="fas fa-save"></i>
+                            </button>
+                            <form method="POST" action="{{ url_for('sterge_angajat', id_angajat=angajat[0]) }}" class="inline-form" onsubmit="return confirm('Sigur doriți să ștergeți acest angajat?');">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Șterge">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="no-data">Nu există angajați în baza de date.</p>
+        {% endif %}
+    </div>
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_stoc') }}" class="btn btn-secondary">
+            <i class="fas fa-warehouse"></i> Gestiune Stoc
+        </a>
+        <a href="{{ url_for('route_rapoarte_complexe') }}" class="btn btn-secondary">
+            <i class="fas fa-chart-bar"></i> Rapoarte
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">
+            <i class="fas fa-sign-out-alt"></i> Deconectare
+        </a>
+    </div>
+</div>
+{% endblock %}

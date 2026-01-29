@@ -1,0 +1,87 @@
+{% extends "app.html" %}
+
+{% block content %}
+    <div class="slideshow-container">
+        <div class="slideshow-wrapper">
+            <div class="slide fade">
+                <img src="/assets/2025-dacia-bigster-rendering-depicts-sub-25k-compact-suv-what-s-the-us-equivalent-3.jpg" alt="Slide 1">
+            </div>
+            <div class="slide fade">
+                <img src="/assets/Toyota-Supra-Hero.webp" alt="Slide 2">
+            </div>
+            <div class="slide fade">
+                <img src="/assets/54196859052_9249719e93_o.jpg" alt="Slide 3">
+            </div>
+            <div class="slide fade">
+                <img src="/assets/aCxkIidWJ-7kSVx9_TeslaModel32025exteriorfrontthreequarterviewdriving.avif" alt="Slide 4">
+            </div>
+            <div class="slide fade">
+                <img src="/assets/e2dbfc3f-127b-4de0-a839-e082dc488eb4_RHD+BMW+M8+Exterior+2.avif" alt="Slide 5">
+            </div>
+            <div class="slide fade">
+                <img src="/assets/nissan-gtr-exterior-driving-1920x774px.jpg" alt="Slide 6">
+            </div>
+            <div class="slide fade">
+                <img src="/assets/renault-talisman-2019-specs-01.jpg" alt="Slide 7">
+            </div>
+        </div>
+
+        <div class="dots-container">
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+            <span class="dot" onclick="currentSlide(4)"></span>
+            <span class="dot" onclick="currentSlide(5)"></span>
+            <span class="dot" onclick="currentSlide(6)"></span>
+            <span class="dot" onclick="currentSlide(7)"></span>
+        </div>
+    </div>
+
+    <script>
+        let slideIndex = 1;
+        let slideTimer;
+
+        function showSlides(n) {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+
+            if (n > slides.length) {
+                slideIndex = 1;
+            }
+            if (n < 1) {
+                slideIndex = slides.length;
+            }
+
+            slides.forEach(slide => {
+                slide.style.display = 'none';
+            });
+
+            dots.forEach(dot => {
+                dot.classList.remove('active');
+            });
+
+            slides[slideIndex - 1].style.display = 'block';
+            dots[slideIndex - 1].classList.add('active');
+        }
+
+        function currentSlide(n) {
+            clearTimeout(slideTimer);
+            showSlides(slideIndex = n);
+            startAutoSlide();
+        }
+
+        function nextSlide() {
+            showSlides(++slideIndex);
+        }
+
+        function startAutoSlide() {
+            slideTimer = setTimeout(() => {
+                nextSlide();
+                startAutoSlide();
+            }, 4000); 
+        }
+
+        showSlides(slideIndex);
+        startAutoSlide();
+    </script>
+{% endblock %}

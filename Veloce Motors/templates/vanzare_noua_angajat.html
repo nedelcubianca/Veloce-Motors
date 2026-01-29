@@ -1,0 +1,211 @@
+{% extends "app.html" %}
+
+{% block title %}Înregistrare Vânzare - Veloce{% endblock %}
+
+{% block content %}
+<div class="container sale-page-v2">
+    <h2>Înregistrare <span class="accent-color">Vânzări</span></h2>
+    <p class="page-subtitle">Gestionează cererile de achiziție și vânzările directe.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="section-block cereri-section">
+        <h3>
+            <i class="fas fa-bell"></i> Cereri de Achiziție Noi
+            {% if cereri_disponibile %}
+                <span class="count-badge">{{ cereri_disponibile|length }}</span>
+            {% endif %}
+        </h3>
+        
+        {% if cereri_disponibile %}
+        <p class="section-info">Aceste cereri sunt disponibile pentru preluare. Preia o cerere pentru a te ocupa de client.</p>
+        
+        <div class="cereri-grid">
+            {% for cerere in cereri_disponibile %}
+            <div class="cerere-card-seller new-request">
+                <div class="cerere-header">
+                    <span class="time-ago">
+                        <i class="fas fa-clock"></i> {{ cerere[9].strftime('%d.%m.%Y %H:%M') if cerere[9] else '-' }}
+                    </span>
+                </div>
+                
+                <div class="cerere-body">
+                    <div class="car-info">
+                        <span class="brand">{{ cerere[2] }}</span>
+                        <h4 class="model">{{ cerere[3] }}</h4>
+                        <span class="color"><i class="fas fa-palette"></i> {{ cerere[4] }}</span>
+                        <span class="price">{{ "{:,.0f}".format(cerere[5]) }} €</span>
+                    </div>
+                    
+                    <div class="client-info">
+                        <div class="client-row">
+                            <i class="fas fa-user"></i>
+                            <span><strong>{{ cerere[6] }}</strong></span>
+                        </div>
+                        <div class="client-row">
+                            <i class="fas fa-phone"></i>
+                            <span>{{ cerere[7] }}</span>
+                        </div>
+                        <div class="client-row">
+                            <i class="fas fa-tag"></i>
+                            <span class="badge badge-info">{{ cerere[8] }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if cerere[10] %}
+                    <div class="client-message">
+                        <i class="fas fa-comment"></i>
+                        <em>"{{ cerere[10] }}"</em>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="cerere-footer">
+                    <form method="POST" action="{{ url_for('preia_cerere', id_cerere=cerere[0]) }}">
+                        <button type="submit" class="btn btn-success btn-block">
+                            <i class="fas fa-hand-paper"></i> Preia Cererea
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-small">
+            <i class="fas fa-inbox"></i>
+            <p>Nu există cereri noi în așteptare.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if cereri_preluate %}
+    <div class="section-block cereri-section my-requests">
+        <h3>
+            <i class="fas fa-tasks"></i> Cererile Mele în Lucru
+            <span class="count-badge active">{{ cereri_preluate|length }}</span>
+        </h3>
+        <p class="section-info">Finalizează vânzările pentru cererile pe care le-ai preluat.</p>
+        
+        <div class="cereri-preluate-list">
+            {% for cerere in cereri_preluate %}
+            <div class="cerere-preluat-card">
+                <div class="cerere-preluat-info">
+                    <div class="car-summary">
+                        <strong>{{ cerere[2] }} {{ cerere[3] }}</strong>
+                        <span class="color-tag">{{ cerere[4] }}</span>
+                    </div>
+                    <div class="client-summary">
+                        <i class="fas fa-user"></i> {{ cerere[7] }}
+                        <span class="phone"><i class="fas fa-phone"></i> {{ cerere[8] }}</span>
+                    </div>
+                    <div class="price-info">
+                        Preț catalog: <strong>{{ "{:,.0f}".format(cerere[5]) }} €</strong>
+                    </div>
+                    <div class="time-info">
+                        <small>Preluat: {{ cerere[11].strftime('%d.%m.%Y %H:%M') if cerere[11] else '-' }}</small>
+                    </div>
+                    {% if cerere[12] %}
+                    <div class="message-info">
+                        <small><i class="fas fa-comment"></i> "{{ cerere[12] }}"</small>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="cerere-preluat-actions">
+                    <form method="POST" action="{{ url_for('finalizeaza_cerere', id_cerere=cerere[0]) }}" class="finalize-form">
+                        <div class="price-input-group">
+                            <label for="pret_final_{{ cerere[0] }}">Preț Final (€):</label>
+                            <input type="number" id="pret_final_{{ cerere[0] }}" name="pret_final" 
+                                   value="{{ cerere[5] }}" step="0.01" required class="input-price">
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check-circle"></i> Finalizează Vânzarea
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{{ url_for('renunta_cerere', id_cerere=cerere[0]) }}" 
+                          onsubmit="return confirm('Sigur vrei să renunți? Cererea va fi disponibilă pentru alți vânzători.');">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-undo"></i> Renunță
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="section-block direct-sale-section">
+        <h3><i class="fas fa-cash-register"></i> Vânzare Directă</h3>
+        <p class="section-info">Pentru clienții care vin direct în showroom (fără cerere online).</p>
+        
+        <form method="POST" action="{{ url_for('vanzare_directa') }}" class="direct-sale-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="vin_masina">Mașină</label>
+                    <select id="vin_masina" name="vin_masina" required onchange="updateDirectPrice()">
+                        <option value="" disabled selected>-- Selectează mașina --</option>
+                        {% for masina in masini %}
+                        <option value="{{ masina[0] }}" data-pret="{{ masina[2] }}">
+                            {{ masina[1] }} - {{ "{:,.0f}".format(masina[2]) }} €
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_client">Client</label>
+                    <select id="id_client" name="id_client" required>
+                        <option value="" disabled selected>-- Selectează clientul --</option>
+                        {% for client in clienti %}
+                        <option value="{{ client[0] }}">{{ client[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pret_final_direct">Preț Final (€)</label>
+                    <input type="number" id="pret_final_direct" name="pret_final" step="1000" required>
+                </div>
+                
+                <div class="form-group form-group-btn" style="margin-left: 30px;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Înregistrează
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_vizualizare_stoc') }}" class="btn btn-secondary">
+            <i class="fas fa-warehouse"></i> Vezi Stoc
+        </a>
+        <a href="{{ url_for('route_performante_proprii') }}" class="btn btn-secondary">
+            <i class="fas fa-chart-bar"></i> Performanța Mea
+        </a>
+    </div>
+</div>
+
+<script>
+function updateDirectPrice() {
+    const select = document.getElementById('vin_masina');
+    const priceInput = document.getElementById('pret_final_direct');
+    
+    if (select.selectedIndex > 0) {
+        const selectedOption = select.options[select.selectedIndex];
+        const pret = selectedOption.getAttribute('data-pret');
+        priceInput.value = pret;
+    } else {
+        priceInput.value = '';
+    }
+}
+</script>
+{% endblock %}

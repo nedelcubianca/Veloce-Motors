@@ -1,0 +1,63 @@
+{% extends "app.html" %}
+
+{% block title %}Vizualizare Stoc - Veloce{% endblock %}
+
+{% block content %}
+<div class="container view-page">
+    <h2>Stoc <span class="accent-color">Disponibil</span></h2>
+    <p class="page-subtitle">Vehicule disponibile pentru vânzare.</p>
+    
+    {% if masini %}
+    <div class="cards-grid">
+        {% for masina in masini %}
+        <div class="car-card">
+            <div class="car-card-header">
+                <span class="car-brand">{{ masina[1] }}</span>
+                <span class="car-model">{{ masina[2] }}</span>
+            </div>
+            <div class="car-card-body">
+                <div class="car-specs">
+                    <div class="spec-item">
+                        <i class="fas fa-car"></i>
+                        <span>{{ masina[3] }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fas fa-gas-pump"></i>
+                        <span>{{ masina[4] }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>{{ masina[5] }} CP</span>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fas fa-cogs"></i>
+                        <span>{{ masina[6] }}</span>
+                    </div>
+                </div>
+                <div class="car-color">
+                    <i class="fas fa-palette"></i> {{ masina[7] }}
+                </div>
+            </div>
+            <div class="car-card-footer">
+                <span class="car-price">{{ "{:,.0f}".format(masina[8]) }} €</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-data">Nu există mașini disponibile în stoc momentan.</p>
+    {% endif %}
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_vanzare_noua') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Înregistrează Vânzare
+        </a>
+        <a href="{{ url_for('route_performante_proprii') }}" class="btn btn-secondary">
+            <i class="fas fa-chart-bar"></i> Performanța Mea
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">
+            <i class="fas fa-sign-out-alt"></i> Deconectare
+        </a>
+    </div>
+</div>
+{% endblock %}

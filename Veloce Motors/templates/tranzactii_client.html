@@ -1,0 +1,116 @@
+{% extends "app.html" %}
+
+{% block title %}Tranzacțiile Mele - Veloce{% endblock %}
+
+{% block content %}
+<div class="container client-page">
+    <h2>Tranzacțiile <span class="accent-color">Mele</span></h2>
+    <p class="page-subtitle">Istoricul achizițiilor și plăților efectuate.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="section-block">
+        <h3><i class="fas fa-car"></i> Vehicule Achiziționate</h3>
+        
+        {% if tranzactii %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nr. Tranzacție</th>
+                        <th>Data</th>
+                        <th>Vehicul</th>
+                        <th>Culoare</th>
+                        <th>Vânzător</th>
+                        <th>Preț (€)</th>
+                        <th>Status Plată</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tranzactie in tranzactii %}
+                    <tr>
+                        <td>#{{ tranzactie[0] }}</td>
+                        <td>{{ tranzactie[1].strftime('%d.%m.%Y') if tranzactie[1] else '-' }}</td>
+                        <td><strong>{{ tranzactie[2] }}</strong></td>
+                        <td>{{ tranzactie[3] }}</td>
+                        <td>{{ tranzactie[4] }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(tranzactie[5]) }}</td>
+                        <td>
+                            {% if tranzactie[6] == 1 %}
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check"></i> Plătit
+                                </span>
+                            {% else %}
+                                <form method="POST" action="{{ url_for('proceseaza_plata', id_vanzare=tranzactie[0]) }}" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    <select name="metoda_plata" class="input-inline input-sm">
+                                        <option value="Card">Card</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Transfer">Transfer</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-credit-card"></i> Plătește
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="no-data">Nu aveți achiziții înregistrate.</p>
+        {% endif %}
+    </div>
+
+    <div class="section-block">
+        <h3><i class="fas fa-credit-card"></i> Plăți Efectuate</h3>
+        
+        {% if plati %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nr. Plată</th>
+                        <th>Data</th>
+                        <th>Sumă (€)</th>
+                        <th>Metodă</th>
+                        <th>Vehicul</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plata in plati %}
+                    <tr>
+                        <td>#{{ plata[0] }}</td>
+                        <td>{{ plata[1].strftime('%d.%m.%Y') if plata[1] else '-' }}</td>
+                        <td class="text-right text-success">{{ "{:,.2f}".format(plata[2]) }}</td>
+                        <td>
+                            <span class="badge badge-info">{{ plata[3] }}</span>
+                        </td>
+                        <td>{{ plata[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="no-data">Nu aveți plăți înregistrate.</p>
+        {% endif %}
+    </div>
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_interes_modele') }}" class="btn btn-primary">
+            <i class="fas fa-heart"></i> Modele de Interes
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">
+            <i class="fas fa-sign-out-alt"></i> Deconectare
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "app.html" %}
+
+{% block title %}Performanța Mea - Veloce{% endblock %}
+
+{% block content %}
+<div class="container performance-page">
+    <h2>Performanța <span class="accent-color">Mea</span></h2>
+    <p class="page-subtitle">Statistici personale de vânzări.</p>
+    
+    <div class="stats-summary">
+        <div class="stat-box">
+            <i class="fas fa-shopping-cart"></i>
+            <div class="stat-content">
+                <span class="stat-value">{{ vanzari|length }}</span>
+                <span class="stat-label">Vânzări Totale</span>
+            </div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-euro-sign"></i>
+            <div class="stat-content">
+                <span class="stat-value">{{ "{:,.0f}".format(total) }}</span>
+                <span class="stat-label">Valoare Totală (€)</span>
+            </div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-calculator"></i>
+            <div class="stat-content">
+                <span class="stat-value">{{ "{:,.0f}".format(total / vanzari|length) if vanzari|length > 0 else 0 }}</span>
+                <span class="stat-label">Media per Vânzare (€)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-block">
+        <h3><i class="fas fa-history"></i> Istoricul Vânzărilor</h3>
+        
+        {% if vanzari %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Data</th>
+                        <th>Mașină</th>
+                        <th>Client</th>
+                        <th>Preț Final (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vanzare in vanzari %}
+                    <tr>
+                        <td>{{ vanzare[0] }}</td>
+                        <td>{{ vanzare[1].strftime('%d.%m.%Y %H:%M') if vanzare[1] else '-' }}</td>
+                        <td><strong>{{ vanzare[2] }}</strong></td>
+                        <td>{{ vanzare[3] }}</td>
+                        <td class="text-right text-success">{{ "{:,.2f}".format(vanzare[4]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-right"><strong>TOTAL:</strong></td>
+                        <td class="text-right"><strong>{{ "{:,.2f}".format(total) }} €</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% else %}
+        <p class="no-data">Nu ați înregistrat încă nicio vânzare.</p>
+        {% endif %}
+    </div>
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_vanzare_noua') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Vânzare Nouă
+        </a>
+        <a href="{{ url_for('route_vizualizare_stoc') }}" class="btn btn-secondary">
+            <i class="fas fa-warehouse"></i> Vezi Stoc
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">
+            <i class="fas fa-sign-out-alt"></i> Deconectare
+        </a>
+    </div>
+</div>
+{% endblock %}

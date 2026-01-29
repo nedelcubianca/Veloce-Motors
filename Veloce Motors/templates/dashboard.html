@@ -1,0 +1,46 @@
+{% extends "app.html" %}
+
+{% block content %}
+    
+    {% if session.get('logged_in') %}
+        <div class="container">
+            <h2>Portal Gestiune <span class="accent-color">Veloce</span></h2>
+            <p>Bine ai venit, <span class="accent-color">{{ session.get('username') }}</span>! Acces: <strong>{{ session.get('rol') }}</strong>.</p>
+            
+            <div class="menu-grid">
+                
+                {% if session.get('rol') == 'Admin' %}
+                    <div class="menu-item"><a href="{{ url_for('route_angajati') }}">Gestiune Angajați</a><p>Inserare, Modificare și Ștergere date Angajați.</p></div>
+                    <div class="menu-item"><a href="{{ url_for('route_stoc') }}">Gestiune Stoc & Modele</a><p>Gestionarea inventarului de mașini și specificații.</p></div>
+                    <div class="menu-item"><a href="{{ url_for('route_rapoarte_complexe') }}">Rapoarte & Statistici</a><p>Statistici complexe și marjă de profit.</p></div>
+                
+                {% elif session.get('rol') == 'Vanzator' %}
+                    <div class="menu-item"><a href="{{ url_for('route_vanzare_noua') }}">Înregistrare Vânzare Nouă</a><p>Înregistrează tranzacțiile de vânzare.</p></div>
+                    <div class="menu-item"><a href="{{ url_for('route_vizualizare_stoc') }}">Vizualizare Stoc</a><p>Verifică ce mașini sunt disponibile.</p></div>
+                    <div class="menu-item"><a href="{{ url_for('route_performante_proprii') }}">Performanța Mea</a><p>Vezi vânzările personale.</p></div>
+
+                {% elif session.get('rol') == 'Client' %}
+                    <div class="menu-item"><a href="{{ url_for('route_istoric_tranzactii') }}">Tranzacțiile Mele</a><p>Vezi istoricul cumpărăturilor și plăților.</p></div>
+                    <div class="menu-item"><a href="{{ url_for('route_interes_modele') }}">Modele de Interes</a><p>Modelele salvate.</p></div>
+                
+                {% endif %}
+
+            </div>
+        </div>
+
+    {% else %}
+        <div class="container" style="text-align: center; padding: 100px 20px;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Bine ați venit la Veloce Motors!</h2>
+            <p style="font-size: 1.2rem; color: #666;">
+                Sistem Centralizat de Gestiune a Vânzărilor Auto.
+            </p>
+            <p style="margin-top: 40px;">
+                Vă rugăm să folosiți butonul **Autentificare** din antet pentru a accesa sistemul intern sau portalul de client.
+            </p>
+            <a href="{{ url_for('login_register') }}" class="btn btn-accent" style="padding: 10px 30px; margin-top: 20px;">
+                Autentificare / Creare Cont
+            </a>
+        </div>
+    {% endif %}
+
+{% endblock %}

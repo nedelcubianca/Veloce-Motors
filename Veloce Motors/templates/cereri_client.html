@@ -1,0 +1,118 @@
+{% extends "app.html" %}
+
+{% block title %}Cererile Mele - Veloce{% endblock %}
+
+{% block content %}
+<div class="container cereri-page">
+    <h2><i class="fas fa-file-alt"></i> Cererile Mele de <span class="accent-color">Achiziție</span></h2>
+    <p class="page-subtitle">Urmărește statusul cererilor tale de cumpărare.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% if cereri %}
+    <div class="cereri-list">
+        {% for cerere in cereri %}
+        <div class="cerere-card status-{{ cerere[7]|lower|replace(' ', '-') }}">
+            
+            <div class="cerere-status-ribbon">
+                {% if cerere[7] == 'In Asteptare' %}
+                    <span class="status-badge waiting"><i class="fas fa-clock"></i> În Așteptare</span>
+                {% elif cerere[7] == 'Preluata' %}
+                    <span class="status-badge active"><i class="fas fa-user-tie"></i> Preluată de Vânzător</span>
+                {% elif cerere[7] == 'Finalizata' %}
+                    <span class="status-badge completed"><i class="fas fa-check-circle"></i> Finalizată</span>
+                {% elif cerere[7] == 'Anulata' %}
+                    <span class="status-badge cancelled"><i class="fas fa-times-circle"></i> Anulată</span>
+                {% endif %}
+            </div>
+            
+            <div class="cerere-content">
+                <div class="cerere-car-info">
+                    <div class="car-image-placeholder">
+                        <i class="fas fa-car-side"></i>
+                    </div>
+                    <div class="car-details">
+                        <span class="car-brand">{{ cerere[2] }}</span>
+                        <h3 class="car-model">{{ cerere[3] }}</h3>
+                        <span class="car-color"><i class="fas fa-palette"></i> {{ cerere[4] }}</span>
+                        <span class="car-price">{{ "{:,.0f}".format(cerere[5]) }} €</span>
+                    </div>
+                </div>
+                
+                <div class="cerere-details">
+                    <div class="detail-row">
+                        <i class="fas fa-calendar"></i>
+                        <span>Cerere trimisă: <strong>{{ cerere[6].strftime('%d.%m.%Y %H:%M') if cerere[6] else '-' }}</strong></span>
+                    </div>
+                    
+                    {% if cerere[8] %}
+                    <div class="detail-row">
+                        <i class="fas fa-comment"></i>
+                        <span>Mesajul tău: <em>"{{ cerere[8] }}"</em></span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if cerere[7] == 'Preluata' and cerere[9] %}
+                    <div class="detail-row highlight">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Vânzător responsabil: <strong>{{ cerere[9] }}</strong></span>
+                    </div>
+                    <div class="detail-row">
+                        <i class="fas fa-clock"></i>
+                        <span>Preluat la: {{ cerere[10].strftime('%d.%m.%Y %H:%M') if cerere[10] else '-' }}</span>
+                    </div>
+                    <p class="info-message">
+                        <i class="fas fa-info-circle"></i> 
+                        Vânzătorul te va contacta în curând pentru finalizarea achiziției.
+                    </p>
+                    {% endif %}
+                    
+                    {% if cerere[7] == 'Finalizata' %}
+                    <p class="success-message" style="color: #2c8b0c;">
+                        <i class="fas fa-check"></i> 
+                         Achiziția a fost finalizată cu succes.
+                    </p>
+                    {% endif %}
+                </div>
+                
+                {% if cerere[7] == 'In Asteptare' %}
+                <div class="cerere-actions">
+                    <form method="POST" action="{{ url_for('anuleaza_cerere_client', id_cerere=cerere[0]) }}" 
+                          onsubmit="return confirm('Sigur doriți să anulați această cerere?');">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-times"></i> Anulează Cererea
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-file-alt fa-4x"></i>
+        <h3>Nu ai cereri de achiziție</h3>
+        <p>Adaugă mașini în coș și trimite o cerere de achiziție pentru a fi contactat de un vânzător.</p>
+        <a href="{{ url_for('route_cos') }}" class="btn btn-primary">
+            <i class="fas fa-shopping-cart" style="margin-top: 23px"></i> Vezi Coșul
+        </a>
+    </div>
+    {% endif %}
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_cos') }}" class="btn btn-secondary">
+            <i class="fas fa-shopping-cart"></i> Coșul Meu
+        </a>
+        <a href="{{ url_for('route_istoric_tranzactii') }}" class="btn btn-secondary">
+            <i class="fas fa-history"></i> Tranzacțiile Mele
+        </a>
+    </div>
+</div>
+{% endblock %}

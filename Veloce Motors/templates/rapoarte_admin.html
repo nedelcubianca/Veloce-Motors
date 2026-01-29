@@ -1,0 +1,259 @@
+{% extends "app.html" %}
+
+{% block title %}Rapoarte & Statistici - Veloce{% endblock %}
+
+{% block content %}
+<div class="container rapoarte-page">
+    <h2>Rapoarte & <span class="accent-color">Statistici</span></h2>
+    <p class="page-subtitle">Analize avansate și indicatori de performanță.</p>
+
+    <div class="report-section filter-section">
+        <h3><i class="fas fa-filter"></i> Filtrare Statistici Vânzări</h3>
+        <form method="GET" action="{{ url_for('route_rapoarte_complexe') }}" class="filter-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="an">An</label>
+                    <select id="an" name="an">
+                        <option value="">Toți anii</option>
+                        {% for year in range(2020, 2027) %}
+                        <option value="{{ year }}" {{ 'selected' if filtru_an|string == year|string else '' }}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="luna">Luna</label>
+                    <select id="luna" name="luna">
+                        <option value="">Toate lunile</option>
+                        {% for month in range(1, 13) %}
+                        <option value="{{ month }}" {{ 'selected' if filtru_luna|string == month|string else '' }}>{{ month }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pret_min">Preț Minim (€)</label>
+                    <input type="number" id="pret_min" name="pret_min" placeholder="0" value="{{ filtru_pret_min }}" step="100">
+                </div>
+                <div class="form-group">
+                    <label for="pret_max">Preț Maxim (€)</label>
+                    <input type="number" id="pret_max" name="pret_max"  value="{{ filtru_pret_max }}" step="100">
+                </div>
+                <div class="form-group form-group-btn" style="margin-left: 30px;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Aplică Filtre
+                    </button>
+                    <a href="{{ url_for('route_rapoarte_complexe') }}" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Resetează
+                    </a>
+                </div>
+            </div>
+        </form>
+        
+        {% if rapoarte.statistici_perioada %}
+        <div class="stats-grid">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>An</th>
+                        <th>Luna</th>
+                        <th>Nr. Vânzări</th>
+                        <th>Total (€)</th>
+                        <th>Preț Mediu (€)</th>
+                        <th>Minim (€)</th>
+                        <th>Maxim (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in rapoarte.statistici_perioada %}
+                    <tr>
+                        <td>{{ stat[0] }}</td>
+                        <td>{{ stat[1] }}</td>
+                        <td>{{ stat[2] }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(stat[3]) }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(stat[4]) }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(stat[5]) }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(stat[6]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="no-data">Nu există date pentru criteriile selectate.</p>
+        {% endif %}
+    </div>
+    
+    <div class="reports-grid">
+ 
+        <div class="report-section">
+            <h3><i class="fas fa-trophy"></i> Top 3 Cele Mai Vândute Mărci</h3>
+            {% if rapoarte.top_marci %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Loc</th>
+                        <th>Marca</th>
+                        <th>Nr. Vânzări</th>
+                        <th>Valoare Totală (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for marca in rapoarte.top_marci %}
+                    <tr class="{{ 'highlight-gold' if loop.index == 1 else ('highlight-silver' if loop.index == 2 else 'highlight-bronze') }}">
+                        <td class="rank-cell">
+                            {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}
+                        </td>
+                        <td><strong>{{ marca[0] }}</strong></td>
+                        <td>{{ marca[1] }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(marca[2]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">Nu există date de vânzări.</p>
+            {% endif %}
+        </div>
+
+        <div class="report-section">
+            <h3><i class="fas fa-star"></i> Angajați cu Vânzări Peste Medie</h3>
+            {% if rapoarte.angajati_performanti %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Angajat</th>
+                        <th>Nr. Vânzări</th>
+                        <th>Total Vânzări (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for angajat in rapoarte.angajati_performanti %}
+                    <tr>
+                        <td><strong>{{ angajat[0] }}</strong></td>
+                        <td>{{ angajat[1] }}</td>
+                        <td class="text-right text-success">{{ "{:,.2f}".format(angajat[2]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">Nu există angajați cu performanțe peste medie.</p>
+            {% endif %}
+        </div>
+        
+        <div class="report-section">
+            <h3><i class="fas fa-heart"></i> Clienți Fideli</h3>
+            {% if rapoarte.clienti_fideli %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Tip</th>
+                        <th>Nr. Achiziții</th>
+                        <th>Total Cheltuit (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in rapoarte.clienti_fideli %}
+                    <tr>
+                        <td><strong>{{ client[0] }}</strong></td>
+                        <td>
+                            <span class="badge {{ 'badge-info' if client[1] == 'Firma' else 'badge-secondary' }}">
+                                {{ client[1] }}
+                            </span>
+                        </td>
+                        <td>{{ client[2] }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(client[3]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">Nu există clienți cu mai multe achiziții.</p>
+            {% endif %}
+        </div>
+
+        <div class="report-section" style="width: 500px;">
+            <h3><i class="fas fa-gem"></i> Mașini Premium (Peste Prețul Mediu al Mărcii)</h3>
+            {% if rapoarte.masini_premium %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Marca</th>
+                        <th>Model</th>
+                        <th>Preț (€)</th>
+                        <th>Media Mărcii (€)</th>
+                        <th>Diferență</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for masina in rapoarte.masini_premium %}
+                    <tr>
+                        <td>{{ masina[0] }}</td>
+                        <td>{{ masina[1] }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(masina[2]) }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(masina[3]) }}</td>
+                        <td class="text-right text-success">
+                            +{{ "{:,.2f}".format(masina[2] - masina[3]) }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">Nu există mașini premium în stoc.</p>
+            {% endif %}
+        </div>
+
+        <div class="report-section report-section-full">
+            <h3><i class="fas fa-chart-line"></i> Marjă de Profit pe Marcă</h3>
+            {% if rapoarte.marja_profit %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Marca</th>
+                        <th>Vehicule Vândute</th>
+                        <th>Cost Total (€)</th>
+                        <th>Venit Total (€)</th>
+                        <th>Profit Brut (€)</th>
+                        <th>Marjă (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for marja in rapoarte.marja_profit %}
+                    <tr>
+                        <td><strong>{{ marja[0] }}</strong></td>
+                        <td>{{ marja[1] }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(marja[2]) }}</td>
+                        <td class="text-right">{{ "{:,.2f}".format(marja[3]) }}</td>
+                        <td class="text-right {{ 'text-success' if marja[4] > 0 else 'text-danger' }}">
+                            {{ "{:,.2f}".format(marja[4]) }}
+                        </td>
+                        <td class="text-right">
+                            <span class="badge {{ 'badge-success' if marja[5] and marja[5] > 10 else 'badge-warning' }}">
+                                {{ marja[5] if marja[5] else 0 }}%
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-data">Nu există date pentru calculul marjei de profit.</p>
+            {% endif %}
+        </div>
+        
+    </div>
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_angajati') }}" class="btn btn-secondary">
+            <i class="fas fa-users"></i> Gestiune Angajați
+        </a>
+        <a href="{{ url_for('route_stoc') }}" class="btn btn-secondary">
+            <i class="fas fa-warehouse"></i> Gestiune Stoc
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">
+            <i class="fas fa-sign-out-alt"></i> Deconectare
+        </a>
+    </div>
+</div>
+{% endblock %}

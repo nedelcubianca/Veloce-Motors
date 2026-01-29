@@ -1,0 +1,56 @@
+{% extends "app.html" %}
+
+{% block title %}Rezultate Căutare - Veloce{% endblock %}
+
+{% block content %}
+<div class="container search-page">
+    <h2>Rezultate pentru: <span class="accent-color">"{{ query }}"</span></h2>
+    
+    {% if results %}
+    <p class="results-count">{{ results|length }} rezultat(e) găsite.</p>
+    
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Marca</th>
+                    <th>Model</th>
+                    <th>Caroserie</th>
+                    <th>Culoare</th>
+                    <th>Preț (€)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for masina in results %}
+                <tr class="{{ 'row-sold' if masina[6] == 'Vandut' else '' }}">
+                    <td><strong>{{ masina[0] }}</strong></td>
+                    <td>{{ masina[1] }}</td>
+                    <td>{{ masina[3] }}</td>
+                    <td>{{ masina[4] }}</td>
+                    <td class="text-right">{{ "{:,.2f}".format(masina[5]) }}</td>
+                    <td>
+                        <span class="badge {{ 'badge-success' if masina[6] == 'Disponibil' else ('badge-warning' if masina[6] == 'Rezervat' else 'badge-secondary') }}">
+                            {{ masina[6] }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="no-results">
+        <i class="fas fa-search fa-3x"></i>
+        <p>Nu am găsit niciun rezultat pentru "<strong>{{ query }}</strong>".</p>
+        <p>Încearcă să cauți după: marcă, model sau culoare.</p>
+    </div>
+    {% endif %}
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-home"></i> Pagina Principală
+        </a>
+    </div>
+</div>
+{% endblock %}

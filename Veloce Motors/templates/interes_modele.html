@@ -1,0 +1,96 @@
+{% extends "app.html" %}
+
+{% block title %}Modele de Interes - Veloce{% endblock %}
+
+{% block content %}
+<div class="container client-page">
+    <h2>Modele de <span class="accent-color">Interes</span></h2>
+    <p class="page-subtitle">Salvează modelele preferate pentru a fi notificat când devin disponibile.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="section-block">
+        <h3><i class="fas fa-plus-circle"></i> Adaugă Model la Lista de Interes</h3>
+        
+        {% if modele_disponibile %}
+        <form method="POST" action="{{ url_for('route_interes_modele') }}" class="inline-add-form">
+            <input type="hidden" name="actiune" value="adauga">
+            <div class="form-row">
+                <div class="form-group flex-grow">
+                    <select name="id_model" required>
+                        <option value="" disabled selected>-- Selectează un model --</option>
+                        {% for model in modele_disponibile %}
+                        <option value="{{ model[0] }}">{{ model[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-heart"></i> Adaugă la Favorite
+                    </button>
+                </div>
+            </div>
+        </form>
+        {% else %}
+        <p class="info-text">Ai adăugat deja toate modelele disponibile la lista de interes!</p>
+        {% endif %}
+    </div>
+
+    <div class="section-block">
+        <h3><i class="fas fa-star"></i> Modelele Mele Favorite</h3>
+        
+        {% if modele_interes %}
+        <div class="interest-cards">
+            {% for model in modele_interes %}
+            <div class="interest-card">
+                <div class="interest-card-header">
+                    <span class="brand">{{ model[1] }}</span>
+                    <span class="model-name">{{ model[2] }}</span>
+                </div>
+                <div class="interest-card-body">
+                    <div class="spec"><i class="fas fa-car"></i> {{ model[3] }}</div>
+                    <div class="spec"><i class="fas fa-gas-pump"></i> {{ model[4] }}</div>
+                    <div class="spec"><i class="fas fa-tachometer-alt"></i> {{ model[5] }} CP</div>
+                </div>
+                <div class="interest-card-footer" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <form method="POST" action="{{ url_for('route_interes_modele') }}" onsubmit="return confirm('Sigur doriți să eliminați acest model din listă?');">
+                        <input type="hidden" name="actiune" value="sterge">
+                        <input type="hidden" name="id_model" value="{{ model[0] }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i> Elimină
+                        </button>
+                    </form>
+                    {% if model[6] %}
+        <form method="POST" action="{{ url_for('adauga_in_cos', vin=model[6]) }}" style="display: inline; margin-left: 7rem; margin-top: -3.5rem;">
+            <button type="submit" class="btn btn-success btn-sm">
+                <i class="fas fa-shopping-cart"></i> Adaugă în coș
+            </button>
+        </form>
+        {% else %}
+        <span class="badge badge-secondary" style="margin-left: 0.5rem;">Indisponibil</span>
+        {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="no-data">Nu ai salvat încă niciun model în lista de interes.</p>
+        {% endif %}
+    </div>
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_istoric_tranzactii') }}" class="btn btn-secondary">
+            <i class="fas fa-history"></i> Tranzacțiile Mele
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">
+            <i class="fas fa-sign-out-alt"></i> Deconectare
+        </a>
+    </div>
+</div>
+{% endblock %}

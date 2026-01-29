@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Veloce{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+       
+    <header>
+    <div class="top_header">
+        <div class="container">
+            <div class="top_header_position">
+
+                <div class="top_header_right d-none d-lg-block">
+                    Ai nevoie de ajutor? Contactează-ne la:
+                    
+                    <a href="tel:+40024242400" class="contact-link">
+                        <i class="fas fa-phone"></i>
+                        <span>+40 024 242 400</span>
+                    </a>
+                    
+                    <a href="mailto:contact@veloce.ro" class="contact-link">
+                        <i class="fas fa-envelope"></i>
+                        <span>contact@veloce.ro</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="header-main-bar">
+    <div class="container">
+        <div class="header-bar-position">
+
+            <div class="header-top-logo">
+                <a href="{{ url_for('dashboard') }}">
+                    <span class="main-logo-text">VELOCE</span>
+                </a>
+            </div>
+
+            <div class="header-top-search">
+                <form action="{{ url_for('search_results') }}" method="GET" class="search-form">
+                    <input type="text" name="query" placeholder="Termenul de căutare..." required>
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="header-top-actions">
+                <div class="header-top-actions-item">
+                    {% if session.get('logged_in') %}
+                        <a href="{{ url_for('portal') }}" class="btn-auth-icon">
+                            <i class="fas fa-user-check"></i>
+                            <span class="d-none d-lg-block ml-2">Contul meu</span>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login_register') }}" class="btn-auth-icon">
+                            <i class="fas fa-user"></i>
+                            <span class="d-none d-lg-block ml-2">Autentificare</span>
+                        </a>
+                    {% endif %}
+                </div>
+                
+                {% if session.get('logged_in') and session.get('rol') == 'Client' %}
+                <div class="header-top-actions-item cart-item">
+                    <a href="{{ url_for('route_cos') }}" class="cart-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="d-none d-lg-block">Coșul meu</span>
+                        {% if cos_count is defined and cos_count > 0 %}
+                            <span class="cart-badge">{{ cos_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if session.get('logged_in') %}
+                <div class="header-top-actions-item">
+                    <a href="{{ url_for('logout') }}" class="btn-auth-icon logout-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="d-none d-lg-block ml-2">Ieșire</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="c-header-menu">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg">
+            
+            <input id="menu-toggle" type="checkbox" />
+            <label class='menu-button-container' for="menu-toggle">
+                <div class='menu-button'></div>
+            </label>
+            
+            <div class="navbar-collapse" id="NavbarMainMenu">
+                <ul class="navbar-nav">
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#">
+                            Autovehicule
+                        </a>
+                        <div class="dropdown-menu">
+                            {% if marci_list %}
+                                {% for marca in marci_list %}
+                                    <a class="dropdown-item" href="{{ url_for('masini_marca', marca=marca) }}">{{ marca }}</a>
+                                {% endfor %}
+                            {% else %}
+                                <a class="dropdown-item" href="#">Nicio marcă găsită</a>
+                            {% endif %}
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}">Despre noi</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="site-footer">
+        <div class="footer-app-section">
+            <div class="container">
+                <h3>Descarcă aplicația noastră mobilă pentru a comanda rapid și convenabil, direct de pe telefonul tău!</h3>
+                <div class="app-coming-soon">
+                    <div class="app-badge">
+                        <i class="fab fa-google-play"></i>
+                        <div class="app-badge-text">
+                            <span class="coming-soon-label">În curând</span>
+                            <span class="store-name">Google Play</span>
+                        </div>
+                    </div>
+                    <div class="app-badge">
+                        <i class="fab fa-apple"></i>
+                        <div class="app-badge-text">
+                            <span class="coming-soon-label">În curând</span>
+                            <span class="store-name">App Store</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-grid">
+                    
+                    <div class="footer-col footer-brand">
+                        <span class="footer-logo">VELOCE</span>
+                        <p class="company-info">
+                            Veloce Motors S.R.L.<br>
+                        </p>
+                        <p class="contact-info">
+                            <a href="mailto:contact@veloce.ro">contact@veloce.ro</a><br>
+                            <a href="tel:+40212345678">+40 024242400</a>
+                        </p>
+                        <div class="social-links">
+                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                            <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-col">
+                        <h4>Despre</h4>
+                        <ul>
+                            <li><a href="{{ url_for('about') }}">Despre Veloce</a></li>
+                            <li><a href="#">Showroom</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Cariere</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-col">
+                        <h4>Informații</h4>
+                        <ul>
+                            <li><a href="#">Întrebări frecvente</a></li>
+                            <li><a href="#">Cum cumpăr online</a></li>
+                            <li><a href="#">Termene & condiții</a></li>
+                            <li><a href="#">Politica de confidențialitate</a></li>
+                            <li><a href="#">Politica cookies</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-col">
+                        <h4>Servicii</h4>
+                        <ul>
+                            <li><a href="#">Programare Service</a></li>
+                            <li><a href="#">Test Drive</a></li>
+                            <li><a href="#">Finanțare</a></li>
+                            <li><a href="#">Evaluare Auto</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-col footer-map">
+                        <h4>Locație</h4>
+                        <div class="map-container">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2848.4080832895584!2d26.0969863!3d44.4467092!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1ff472f47f047%3A0x493984726f0235f9!2sPia%C8%9Ba%20Roman%C4%83%2C%20Bucure%C8%99ti!5e0!3m2!1sro!2sro!4v1702736400000!5m2!1sro!2sro" 
+                                width="100%" 
+                                height="180" 
+                                style="border:0; border-radius: 8px;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                        <p class="address">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Piața Romană 12, București
+                        </p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2025 Veloce Motors. Toate drepturile rezervate.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

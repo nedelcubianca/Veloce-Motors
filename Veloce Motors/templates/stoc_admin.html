@@ -1,0 +1,201 @@
+{% extends "app.html" %}
+
+{% block title %}Gestiune Stoc - Veloce{% endblock %}
+
+{% block content %}
+<div class="container crud-page">
+    <h2>Gestiune <span class="accent-color">Stoc Mașini</span></h2>
+    <p class="page-subtitle">Administrare inventar și specificații vehicule.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="crud-section">
+    <h3>Adaugă Mașină în Stoc</h3>
+    <form method="POST" action="{{ url_for('adauga_masina') }}" class="crud-form">
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="vin">VIN (Seria de Șasiu)</label>
+                <input type="text" id="vin" name="vin" placeholder="Ex: WVWZZZ3CZWE123456" required>
+            </div>
+            <div class="form-group">
+                <label for="nume_model">Nume Model</label>
+                <input type="text" id="nume_model" name="nume_model" placeholder="Ex: Golf 8" required>
+            </div>
+            <div class="form-group">
+                <label for="marca">Marca</label>
+                <input type="text" id="marca" name="marca" placeholder="Ex: Volkswagen" required>
+            </div>
+        </div>
+        
+        <div class="form-row" style="margin-top: 1rem;">
+            <div class="form-group">
+                <label for="generatie">Generație</label>
+                <input type="text" id="generatie" name="generatie" placeholder="Ex: 2020-2024">
+            </div>
+            <div class="form-group">
+                <label for="tip_caroserie">Tip Caroserie</label>
+                <select id="tip_caroserie" name="tip_caroserie">
+                    <option value="Sedan">Sedan</option>
+                    <option value="Hatchback">Hatchback</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Break">Break</option>
+                    <option value="Coupe">Coupe</option>
+                    <option value="Cabrio">Cabrio</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="combustibil">Combustibil</label>
+                <select id="combustibil" name="combustibil">
+                    <option value="Benzina">Benzină</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Hibrid">Hibrid</option>
+                    <option value="Electric">Electric</option>
+                    <option value="GPL">GPL</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row" style="margin-top: 1rem;">
+            <div class="form-group">
+                <label for="capacitate">Capacitate Cilindrică (cm³)</label>
+                <input type="number" id="capacitate" name="capacitate" placeholder="Ex: 1998" step="1" min="0">
+            </div>
+            <div class="form-group">
+                <label for="putere">Putere (CP)</label>
+                <input type="number" id="putere" name="putere" placeholder="Ex: 150" step="1" min="0">
+            </div>
+            <div class="form-group">
+                <label for="transmisie">Transmisie</label>
+                <select id="transmisie" name="transmisie">
+                    <option value="Manuala">Manuală</option>
+                    <option value="Automata">Automată</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="norma_poluare">Norma Poluare</label>
+                <select id="norma_poluare" name="norma_poluare">
+                    <option value="Euro 6">Euro 6</option>
+                    <option value="Euro 5">Euro 5</option>
+                    <option value="Euro 4">Euro 4</option>
+                    <option value="Euro 3">Euro 3</option>
+                    <option value="Zero">Zero</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row" style="margin-top: 1rem;">
+            <div class="form-group">
+                <label for="culoare">Culoare Exterior</label>
+                <input type="text" id="culoare" name="culoare" placeholder="Ex: Negru Metalic" required>
+            </div>
+            <div class="form-group" style="margin-right: 2rem;">
+                <label for="data_intrare">Data Intrării în Stoc</label>
+                <input type="date" id="data_intrare" name="data_intrare" required>
+            </div>
+            <div class="form-group" style="margin-right: 2rem;">
+                <label for="cost_achizitie">Cost Achiziție (€)</label>
+                <input type="number" id="cost_achizitie" name="cost_achizitie" placeholder="Ex: 25000" step="1" min="0" required>
+            </div>
+        </div>
+
+        <div class="form-row" style="margin-top: 1rem; ">
+            <div class="form-group" style="margin-right: 2rem;">
+                <label for="pret">Preț Vânzare (€)</label>
+                <input type="number" id="pret" name="pret" placeholder="Ex: 28500" step="1" min="0" required>
+            </div>
+            <div class="form-group-btn">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Adaugă în Stoc
+                </button>
+            </div>
+        </div>
+        
+    </form>
+</div>
+
+    <div class="crud-section">
+        <h3>Inventar Curent </h3>
+        
+        {% if masini %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>VIN</th>
+                        <th>Marca</th>
+                        <th>Model</th>
+                        <th>Caroserie</th>
+                        <th>Culoare</th>
+                        <th>Dată Intrare</th>
+                        <th>Cost (€)</th>
+                        <th>Preț (€)</th>
+                        <th>Status</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for masina in masini %}
+                    <tr class="{{ 'row-sold' if masina[8] == 'Vandut' else '' }}">
+                        <td class="vin-cell">{{ masina[0][:10] }}...</td>
+                        <td>{{ masina[1] }}</td>
+                        <td>{{ masina[2] }}</td>
+                        <td>{{ masina[3] }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('modifica_masina', vin=masina[0]) }}" class="inline-form" id="form-{{ loop.index }}">
+                                <input type="text" name="culoare" value="{{ masina[4] }}" class="input-inline input-sm">
+                        </td>
+                        <td>{{ masina[5].strftime('%d.%m.%Y') if masina[5] else '-' }}</td>
+                        <td>
+                                <input type="number" name="cost_achizitie" value="{{ masina[6] }}" class="input-inline input-sm" step="0.01">
+                        </td>
+                        <td>
+                                <input type="number" name="pret" value="{{ masina[7] }}" class="input-inline input-sm" step="0.01">
+                            </form>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ masina[8]|lower|replace(' ', '-') }}">
+                                {{ masina[8] }}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <button type="submit" form="form-{{ loop.index }}" class="btn btn-sm btn-primary" title="Salvează">
+                                <i class="fas fa-save"></i>
+                            </button>
+                            {% if masina[8] != 'Vandut' %}
+                            <form method="POST" action="{{ url_for('sterge_masina', vin=masina[0]) }}" class="inline-form" onsubmit="return confirm('Sigur doriți să ștergeți această mașină din stoc?');">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Șterge">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="no-data">Nu există mașini în stoc.</p>
+        {% endif %}
+    </div>
+    
+    <div class="nav-buttons">
+        <a href="{{ url_for('route_angajati') }}" class="btn btn-secondary">
+            <i class="fas fa-users"></i> Gestiune Angajați
+        </a>
+        <a href="{{ url_for('route_rapoarte_complexe') }}" class="btn btn-secondary">
+            <i class="fas fa-chart-bar"></i> Rapoarte
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">
+            <i class="fas fa-sign-out-alt"></i> Deconectare
+        </a>
+    </div>
+</div>
+{% endblock %}

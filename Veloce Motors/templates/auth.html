@@ -1,0 +1,107 @@
+{% extends "app.html" %}
+
+{% block content %}
+    <div class="container auth-page-wrapper"> 
+        
+        <h1>Autentificare</h1>
+        <p class="auth-intro">Pentru a finaliza comanda rapid, îți recomandăm să îți creezi un cont.</p>
+        
+        {% if error %}
+            <p class="auth-message error">{{ error }}</p>
+        {% elif success_message %}
+            <p class="auth-message success"> {{ success_message }}</p>
+        {% endif %}
+        
+        <div class="auth-flex-container">
+            
+            <div class="auth-box login-box">
+                <h2>Autentificare</h2>
+
+                <form method="POST" action="{{ url_for('login_register') }}">
+        <input type="hidden" name="btn_login" value="1">
+        
+        <label for="login_username">Nume Utilizator</label>
+        <input type="text" id="login_username" name="login_username" placeholder="Nume Utilizator" required>
+        
+        <label for="login_password">Parolă</label>
+        <input type="password" id="login_password" name="login_password" placeholder="Parolă" required>
+        
+        <p class="forgot-password"><a href="#">Ai uitat parola?</a></p>
+        
+        <input type="submit" name="btn_login" value="Autentificare →">
+    </form>
+            </div>
+
+            <div class="auth-box register-box">
+    <h2>Creează Cont</h2>
+    
+    <form method="POST" action="{{ url_for('login_register') }}">
+        <input type="hidden" name="btn_register" value="1">
+
+        <div class="form-row-flex">
+            
+            <div class="form-group-full">
+                <label for="reg_tip_client">Tip Client</label>
+                <select id="reg_tip_client" name="reg_tip_client" required>
+                    <option value="" disabled selected hidden>Tip Client</option>
+                    <option value="Persoana Fizica">Persoană Fizică</option>
+                    <option value="Firma">Firmă</option>
+                </select>
+            </div>
+            
+            <div class="form-group-half">
+                <label for="reg_nume">Nume</label>
+                <input type="text" id="reg_nume" name="reg_nume" placeholder="Nume" required>
+            </div>
+            <div class="form-group-half">
+                <label for="reg_prenume">Prenume</label>
+                <input type="text" id="reg_prenume" name="reg_prenume" placeholder="Prenume" required>
+            </div>
+            
+            <div class="form-group-half">
+                <label for="reg_tara">Țara</label>
+                <input type="text" id="reg_tara" name="reg_tara" placeholder="Țara" required >
+            </div>
+            <div class="form-group-half">
+                <label for="reg_oras">Oraș</label>
+                <input type="text" id="reg_oras" name="reg_oras" placeholder="Oraș" required>
+            </div>
+            <div class="form-group-half">
+                <label for="reg_strada">Stradă</label>
+                <input type="text" id="reg_strada" name="reg_strada" placeholder="Stradă" required>
+            </div>
+            <div class="form-group-half">
+                <label for="reg_numar_strada">Număr Stradă</label>
+                <input type="text" id="reg_numar_strada" name="reg_numar_strada" placeholder="Număr Stradă" required>
+            </div>
+            
+            <div class="form-group-full">
+                <label for="reg_telefon">Telefon</label>
+                <input type="text" id="reg_telefon" name="reg_telefon" placeholder="Telefon" required>
+            </div>
+        </div>
+        
+        <hr>
+
+        <div class="form-row-flex">
+            <div class="form-group-half">
+                <label for="reg_username">Nume Utilizator</label>
+                <input type="text" id="reg_username" name="reg_username" placeholder="Nume Utilizator" required>
+            </div>
+            <div class="form-group-half">
+                <label for="reg_password">Parolă</label>
+                <input type="password" id="reg_password" name="reg_password" placeholder="Parolă" required>
+            </div>
+        </div>
+        
+        <div class="terms-agreement">
+            <label><input type="checkbox" required> Am citit și sunt de acord cu Termenii și Condițiile.</label>
+        </div>
+
+        <input type="submit" name="btn_register" value="Creează Cont →">
+    </form>
+</div>
+            
+        </div>
+    </div>
+{% endblock %}
